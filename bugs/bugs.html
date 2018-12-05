@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<div>
+		<h3>如下图所示，问题在箭头标明的地方</h3>
+		<p>hasLabelIndex(entityCluster, item.id)传进来的entityCluster的entityCluster._collectionIndicesByEntity是一个以guid为键的对象集合，item.id却不是一个guid, 而是一个Entity对象，所以hasLabelIndex函数始终会返回false;下面的代码就不会执行，标签就不会显示了</p>
+		<p><img src="./111.png"></p>
+		<p><img src="./222.png"><img src="./333.png"></p>
+		<h3>修改如下图</h3>
+		<p><img src="./444.png"></p>
+		<h3>效果图(红色是没聚合的文字)也是显示了的</h3>
+		<p><img src="./555.png"></p>
+	</div>
+</body>
+</html>
