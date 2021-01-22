@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #box{
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #box>#setting>div{
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+        #box>#setting>div>span{
+            width: 140px;
+            display: inline-block;
+        }
+        #box>#setting>div input{
+            height: 26px;
+            border: 1px solid red;
+            outline: none;
+            text-indent: 10px;
+        }
+
+        .determine{
+            width: 100%;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1584e5;
+            margin: 10px;
+            color: #fff;
+            font-size: 22px;
+        }
+        .listHaos{
+            /* border: 1px solid #ccc; */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid red;
+        }
+        .listHaos>li{
+            list-style: none;
+        }
+
+        .listHaos>li>span{
+            display: inline-flex;
+            width: 30px;
+            height: 30px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .listHaos>li>span.hong{
+            color: red;
+        }
+        .listHaos>li>span.lan{
+            color: blue;
+        }
+        .haotype{
+            display: flex;
+            width: 100%;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+        .haotype>div{
+            flex: 1;
+            /* background-color: #0389ff; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px;
+            border: 1px solid blue;
+            color: blue;
+        }
+
+        .haotype>div.active{
+            background-color: blue;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <div class="haotype">
+            <div data-bind="css: {active: type() === 'seq'}, click: changeType.bind($data, 'seq')">双色球</div>
+            <div data-bind="css: {active: type() === 'dlt'}, click: changeType.bind($data, 'dlt')">大乐透</div>
+            <div data-bind="css: {active: type() === 'zdy'}, click: changeType.bind($data, 'zdy')">自定义</div>
+        </div>
+
+        <div id="setting">
+            <div><span>循环次数</span><input type="number" data-bind="value: cycles"></div>
+            <div><span>红码个数</span><input type="number" data-bind="value: redNum"></div>
+            <div><span>选几个</span><input type="number" data-bind="value: redChooseNum"></div>
+            <div><span>是否需要蓝码</span><input type="checkbox"  data-bind="checked: isBlue"></div>
+            <div data-bind="visible: isBlue"><span>蓝码个数</span><input type="number" data-bind="value: blueNum"></div>
+            <div data-bind="visible: isBlue"><span>选几个</span><input type="number" data-bind="value: blueChooseNum"></div>
+            <div><span>生成几组号码</span><input type="number" data-bind="value: groups"></div>
+        </div>
+        <ul class="listHaos" data-bind="visible: listHaos().length !== 0">
+            <!-- ko foreach: listHaos -->
+            <li>
+                <!-- ko foreach: hong -->
+                <span class="hong" data-bind="text: $data"></span>
+                <!-- /ko -->
+                
+                <!-- ko if: $data.lan -->
+                <!-- ko foreach: lan -->
+                <span class="lan" data-bind="text: $data"></span>
+                <!-- /ko -->
+                <!-- /ko -->
+            </li>
+            <!-- /ko -->
+        </ul>
+        <div class="determine" data-bind="click: determine">确定</div>
+    </div>
+    <script src="./knockout.js"></script>
+    <script>
+        function viewModel () {
+
+            var that = this;
+
+            this.type = ko.observable("zdy");
+
+            this.cycles = ko.observable(5);
+            this.redNum = ko.observable(33);
+            this.redChooseNum = ko.observable(5);
+            this.isBlue = ko.observable(true);
+            this.blueNum = ko.observable(12);
+            this.blueChooseNum = ko.observable(2);
+            this.groups = ko.observable(5);
+
+            this.listHaos = ko.observableArray([])
+
+            this.determine = function () {
+                that.listHaos([])
+                var cycles = that.cycles();
+                var redNum = that.redNum();
+                var redChooseNum = that.redChooseNum();
+                var isBlue = that.isBlue();
+                var blueNum = that.blueNum();
+                var blueChooseNum = that.blueChooseNum();
+                var groups = that.groups();
+
+                for (var i = 0; i < groups; i++) {
+                    var haoObj = JH(cycles, redNum, redChooseNum, isBlue, blueNum, blueChooseNum);
+                    console.log(haoObj)
+
+                    that.listHaos.push(haoObj)
+                }
+            }
+
+            this.changeType = function (type) {
+                that.listHaos([])
+                that.type(type);
+
+                switch (type) {
+                    case 'seq':
+                        that.redNum(33);
+                        that.redChooseNum(6);
+                        that.isBlue(true);
+                        that.blueNum(16);
+                        that.blueChooseNum(1);
+                        break;
+                    case 'dlt':
+                        that.redNum(35);
+                        that.redChooseNum(5);
+                        that.isBlue(true);
+                        that.blueNum(12);
+                        that.blueChooseNum(2);
+                        break;
+                    case 'zdy':
+                        break;
+                }
+
+                console.log(type)
+            }
+        }
+
+        function JH(cs, Hlength, numH, isBlue, Llength, numL) {
+            function xuanhao(length, num) {
+                var data = Array.from(Array(length), (v,k) => k + 1);;
+                data.sort(function() {
+                    return (0.5-Math.random());
+                });
+                
+                var haos = [];
+                for (var i = 0; i < num; i++) {
+                    var hao = quhao (haos);
+                    haos.push(hao)
+                }
+                
+                function quhao (haos) {
+                    var index = Math.floor((Math.random()*data.length));
+                    var hao = data[index];
+                    data.splice(index, 1);
+                    return hao;
+                }
+                
+                haos.sort(function(a,b){
+                    return a - b;
+                })
+                return haos;
+            
+            
+            }
+
+            function mapfun (cs, length, num) {
+                // var objs = new Map();
+                var haos;
+                for (var i = 0; i < cs; i++) {
+                    haos = xuanhao(length, num);
+                }
+
+                return haos;
+            }
+
+            
+            var hong = mapfun (cs, Hlength, numH);
+
+            var robj = {
+                hong: hong
+            }
+            if (isBlue) {
+                var lan = mapfun (cs, Llength, numL);
+                robj.lan = lan
+            }
+            
+
+            return robj
+            
+        }
+
+        ko.applyBindings(new viewModel(), document.getElementById('box'))
+    </script>
+</body>
+</html>
